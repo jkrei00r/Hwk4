@@ -32,12 +32,12 @@ def main():
     x = np.linspace(lower, upper, 1000)
 
     # Calculate PDF and CDF
-    pdf_values = [truncated_lognormal_pdf(xi, mu, sigma, lower, upper) for xi in x]
-    cdf_values = [quad(lambda xi: truncated_lognormal_pdf(xi, mu, sigma, lower, upper), lower, xi)[0] for xi in x]
+    pdf_values = np.array([truncated_lognormal_pdf(xi, mu, sigma, lower, upper) for xi in x])
+    cdf_values = lognorm.cdf(x, sigma, scale=np.exp(mu)) / (lognorm.cdf(upper, sigma, scale=np.exp(mu)) - lognorm.cdf(lower, sigma, scale=np.exp(mu)))
 
     # Determine the upper limit for the shaded area
     D_upper = lower + (upper - lower) * 0.75
-    shaded_area = quad(lambda xi: truncated_lognormal_pdf(xi, mu, sigma, lower, upper), lower, D_upper)[0]
+    shaded_area = lognorm.cdf(D_upper, sigma, scale=np.exp(mu)) / (lognorm.cdf(upper, sigma, scale=np.exp(mu)) - lognorm.cdf(lower, sigma, scale=np.exp(mu)))
 
     # Plotting
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
@@ -51,7 +51,7 @@ def main():
     ax1.legend()
 
     # Annotate the shaded area equation
-    ax1.text(D_upper, max(pdf_values) * 0.5, f'P(D ≤ {D_upper:.2f}) = {shaded_area:.3f}', fontsize=12, color='black')
+    ax1.text(D_upper, max(pdf_values) * 0.5, f'P(D ≤ {D_upper:.2f}) = {shaded_area:.3f}', fontsize=12, color='black', ha='right')
 
     # CDF plot
     ax2.plot(x, cdf_values, label='CDF: $F(D) = P(D \\leq d)$', color='orange')
@@ -66,4 +66,5 @@ def main():
 # region function calls
 if __name__ == '__main__':
     main()
+# endregion
 # endregion
