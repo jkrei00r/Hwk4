@@ -1,0 +1,62 @@
+# region imports
+import numpy as np
+import matplotlib.pyplot as plt
+from scipy.stats import lognorm
+from scipy.integrate import quad
+# endregion
+
+# region function definitions
+def truncated_lognormal_pdf(x, mu, sigma, lower, upper):
+    """
+    Truncated log-normal PDF.
+    :param x: value at which to evaluate the PDF
+    :param mu: mean of the log-normal distribution
+    :param sigma: standard deviation of the log-normal distribution
+    :param lower: lower truncation limit
+    :param upper: upper truncation limit
+    :return: value of the truncated log-normal PDF at x
+    """
+    if x < lower or x > upper:
+        return 0
+    else:
+        return lognorm.pdf(x, sigma, scale=np.exp(mu)) / (lognorm.cdf(upper, sigma, scale=np.exp(mu)) - lognorm.cdf(lower, sigma, scale=np.exp(mu)))
+
+def main():
+    # User input for log-normal distribution parameters
+    mu = float(input("Enter the mean (mu) of the log-normal distribution: "))
+    sigma = float(input("Enter the standard deviation (sigma) of the log-normal distribution: "))
+    lower = float(input("Enter the lower truncation limit: "))
+    upper = float(input("Enter the upper truncation limit: "))
+
+    # Generate x values
+    x = np.linspace(lower, upper, 1000)
+
+    # Calculate PDF and CDF
+    pdf_values = [truncated_lognormal_pdf(xi, mu, sigma, lower, upper) for xi in x]
+    cdf_values = [quad(lambda xi: truncated_lognormal_pdf(xi, mu, sigma, lower, upper), lower, xi)[0] for xi in x]
+
+    # Plotting
+    fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
+
+    # PDF plot
+    ax1.plot(x, pdf_values, label='Truncated Log-Normal PDF')
+    ax1.fill_between(x, pdf_values, where=(x <= lower + (upper - lower) * 0.75), color='grey', alpha=0.5)
+    ax1.set_xlabel('x')
+    ax1.set_ylabel('PDF')
+    ax1.set_title('Truncated Log-Normal PDF')
+    ax1.legend()
+
+    # CDF plot
+    ax2.plot(x, cdf_values, label='Truncated Log-Normal CDF', color='orange')
+    ax2.set_xlabel('x')
+    ax2.set_ylabel('CDF')
+    ax2.set_title('Truncated Log-Normal CDF')
+    ax2.legend()
+
+    plt.tight_layout()
+    plt.show()
+
+# region function calls
+if __name__ == '__main__':
+    main()
+# endregion
