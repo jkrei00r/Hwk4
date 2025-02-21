@@ -1,9 +1,7 @@
-#Truncated log-normal distribution
 # region imports
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy.stats import lognorm
-from scipy.integrate import quad
 # endregion
 
 # region function definitions
@@ -25,7 +23,8 @@ def truncated_lognormal_pdf(x, mu, sigma, lower, upper):
         return 0
     else:
         # Normalize the log-normal PDF by the truncation limits
-        return lognorm.pdf(x, sigma, scale=np.exp(mu)) / (lognorm.cdf(upper, sigma, scale=np.exp(mu)) - lognorm.cdf(lower, sigma, scale=np.exp(mu)))
+        normalization = lognorm.cdf(upper, sigma, scale=np.exp(mu)) - lognorm.cdf(lower, sigma, scale=np.exp(mu))
+        return lognorm.pdf(x, sigma, scale=np.exp(mu)) / normalization
 
 def main():
     """
@@ -33,16 +32,24 @@ def main():
 
     This function:
     1. Prompts the user for input parameters (mu, sigma, lower, and upper limits).
-    2. Computes the PDF and CDF of the truncated log-normal distribution.
-    3. Plots the PDF with a shaded area representing the probability up to a specific upper limit.
-    4. Plots the CDF.
-    5. Displays the plots with proper labels and annotations.
+    2. Validates the input to ensure the lower limit is less than the upper limit.
+    3. Computes the PDF and CDF of the truncated log-normal distribution.
+    4. Plots the PDF with a shaded area representing the probability up to a specific upper limit.
+    5. Plots the CDF.
+    6. Displays the plots with proper labels and annotations.
     """
     # User input for log-normal distribution parameters
     mu = float(input("Enter the mean (mu) of the log-normal distribution: "))
     sigma = float(input("Enter the standard deviation (sigma) of the log-normal distribution: "))
-    lower = float(input("Enter the lower truncation limit: "))
-    upper = float(input("Enter the upper truncation limit: "))
+
+    # Validate lower and upper truncation limits
+    while True:
+        lower = float(input("Enter the lower truncation limit: "))
+        upper = float(input("Enter the upper truncation limit: "))
+        if lower < upper:
+            break
+        else:
+            print("Error: The lower limit must be less than the upper limit. Please try again.")
 
     # Generate x values for the plot
     x = np.linspace(lower, upper, 1000)
@@ -51,13 +58,14 @@ def main():
     pdf_values = np.array([truncated_lognormal_pdf(xi, mu, sigma, lower, upper) for xi in x])
 
     # Calculate the CDF values for the truncated log-normal distribution
-    cdf_values = lognorm.cdf(x, sigma, scale=np.exp(mu)) / (lognorm.cdf(upper, sigma, scale=np.exp(mu)) - lognorm.cdf(lower, sigma, scale=np.exp(mu)))
+    normalization = lognorm.cdf(upper, sigma, scale=np.exp(mu)) - lognorm.cdf(lower, sigma, scale=np.exp(mu))
+    cdf_values = lognorm.cdf(x, sigma, scale=np.exp(mu)) / normalization
 
     # Determine the upper limit for the shaded area (75% of the range)
     D_upper = lower + (upper - lower) * 0.75
 
     # Calculate the shaded area (probability P(D ≤ D_upper))
-    shaded_area = lognorm.cdf(D_upper, sigma, scale=np.exp(mu)) / (lognorm.cdf(upper, sigma, scale=np.exp(mu)) - lognorm.cdf(lower, sigma, scale=np.exp(mu)))
+    shaded_area = lognorm.cdf(D_upper, sigma, scale=np.exp(mu)) / normalization
 
     # Plotting
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(10, 8))
@@ -88,8 +96,6 @@ def main():
 if __name__ == '__main__':
     main()
 # endregion
-
-# region function calls
 if __name__ == '__main__':
     main()
 # endregion
