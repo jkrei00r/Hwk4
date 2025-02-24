@@ -1,4 +1,4 @@
-#Truncated log-normal distribution
+# Truncated log-normal distribution
 # region imports
 import numpy as np
 import matplotlib.pyplot as plt
@@ -81,6 +81,10 @@ def main():
 
     # Annotate the shaded area equation
     ax1.text(D_upper, max(pdf_values) * 0.5, f'P(D ≤ {D_upper:.2f}) = {shaded_area:.3f}', fontsize=12, color='black', ha='right')
+
+    # Add the equation above the shaded area
+    equation = r'$f(D)=\frac{1}{D\cdot \sigma \sqrt{2\pi }}\cdot e^{-\frac{1}{2}\left(\frac{\ln (D)-\mu }{\sigma }\right)^{2}}$'
+    ax1.text((lower + upper) / 2, max(pdf_values) * 0.9, equation, fontsize=12, color='black', ha='center')
 
     # CDF plot
     ax2.plot(x, cdf_values, label='CDF: $F(D) = P(D \\leq d)$', color='orange')
