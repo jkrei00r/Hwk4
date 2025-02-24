@@ -1,3 +1,4 @@
+#Revised program from Week 1
 # region imports
 import numpy as np
 from scipy.integrate import quad
