@@ -1,3 +1,4 @@
+#Truncated log-normal distribution
 # region imports
 import numpy as np
 import matplotlib.pyplot as plt
